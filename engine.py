@@ -10,7 +10,6 @@ class Database(object):
         # Database initialisation
         self.name = name
         self.tables = tables
-        print 'self :',self.name
 
     def __name__(self):
         # return database name
@@ -53,3 +52,49 @@ class Database(object):
         Table['row'] = []
         self.tables.append(Table)
         # print self.tables
+
+    def load_contents(self):
+        # load table records in database
+        for i in range(len(self.tables)):
+            name_table = self.tables[i]['name']
+            name = name_table + '.csv'
+            with open(name) as table:
+                rows = table.readlines()
+
+                rows = map(lambda x:x.strip(),rows)
+                for j in range(len(rows)):
+                    row = re.split(',',rows[j])
+                    self.tables[i]['row'].append(row)
+
+    def print_database(self):
+        print '''
+                *** Your Desireed Database ***
+                    '''
+        print 'Database name :',self.name
+        for i in range(len(self.tables)):
+            name_table = self.tables[i]['name']
+            print '----------', name_table, '----------'
+            for j in range(len(self.tables[i]['columns'])):
+                print self.tables[i]['columns'][j],
+            print
+
+            for j in range(len(self.tables[i]['row'])):
+                for k in range(len(self.tables[i]['row'][j])):
+                    print self.tables[i]['row'][j][k],
+                print
+
+            print
+
+
+    def get_table(self,tablename):
+        # Returns the table whoose name is tablename.
+
+        temp = filter(lambda x: x['name'] == tablename, self.tables)
+        if temp == list():
+            raise Exception("No such table")
+        return temp[0]
+
+    def delete_table(self, tablename):
+        # Deletes a table from the database.
+        self.tables = filter(lambda x: x['name'] != tablename, self.tables)
+        print tablename, 'successfully deleted'
